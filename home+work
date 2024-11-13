@@ -1,0 +1,132 @@
+------------------------------ 1
+DROP TABLE IF EXISTS book_reviews;
+DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS authors;
+DROP TABLE IF EXISTS publishers;
+
+CREATE TABLE IF NOT EXISTS books (
+    id SERIAL PRIMARY KEY,
+    book_name VARCHAR(100) NOT NULL,
+    author_id INT NOT NULL,
+    publisher_id INT NOT NULL,
+    genre VARCHAR(50) NOT NULL,
+    publish_date DATE,
+    price NUMERIC(6, 2) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS authors (
+    id SERIAL PRIMARY KEY,
+    author_name VARCHAR(100) NOT NULL,
+    birth_date DATE,
+    country VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS publishers (
+    id SERIAL PRIMARY KEY,
+    publisher_name VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    founding_year INT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS book_reviews (
+    id SERIAL PRIMARY KEY,
+    book_id INT NOT NULL,
+    review_text TEXT,
+    grade INT NOT NULL,
+    review_date TIMESTAMP
+);
+-----------------------------------2
+INSERT INTO authors (author_name, birth_date, country)
+VALUES
+('Orxon Xamzaev', '1980-03-12', 'O''zbekiston'),
+('Javlonbek Shukurov', '1975-06-24', 'Qozog''iston'),
+('O''tkir Hoshimov', '1965-02-15', 'O''zbekiston'),
+('Gulbahor Murodova', '1990-10-09', 'Tojikiston'),
+('Dilshod Karimov', '1988-08-30', 'Qirg''iziston');
+
+INSERT INTO books (book_name, author_id, publisher_id, genre, publish_date, price)
+VALUES
+('Hayot va Tabiat', 1, 1, 'Falsafa', '2010-01-01', 15.50),
+('Yoshlar uchun Maktub', 2, 2, 'Motivatsiya', '2015-03-15', 18.00),
+('Sevgi va Dard', 3, 3, 'Roman', '2020-06-10', 12.75),
+('Tinchlik Va Barqarorlik', 4, 4, 'Siyosat', '2018-05-20', 20.00),
+('Xotira izlari', 5, 5, 'Eski tarix', '2021-12-12', 10.50),
+('Qiyomatdan oldin', 1, 2, 'Triller', '2016-08-23', 14.30),
+('O''zbekistonning kelajagi', 2, 3, 'Siyosat', '2017-07-19', 25.00),
+('Qalbning sirlari', 3, 4, 'Roman', '2019-09-01', 22.00),
+('Kitoblar va odamlar', 4, 5, 'Jurnalistika', '2015-04-22', 17.40),
+('Boshqa dunyolar', 5, 1, 'Fan fantastika', '2020-11-11', 16.80);
+
+INSERT INTO book_reviews (book_id, review_text, grade, review_date)
+VALUES
+(1, 'Ajoyib kitob, hayotning sirlarini o''rgatadi.', 5, '2023-01-15 10:30:00'),
+(2, 'Motivatsiya olish uchun ajoyib manba.', 4, '2023-02-10 14:20:00'),
+(3, 'Qalbni yoritadigan kitob, romantik tushuncha.', 4, '2023-03-05 16:45:00'),
+(4, 'Siyosat va barqarorlik haqida foydali maslahatlar.', 5, '2023-04-12 09:00:00'),
+(5, 'Tarixga oid kitob, eski davrlarni yaxshi tushuntiradi.', 3, '2023-05-18 11:10:00');
+-- ----------------------------3
+SELECT * FROM books;
+--1
+SELECT book_name AS "Kitob nomi", genre AS "Janr", price AS "Narx", publish_date AS "Nashr sanasi"
+FROM books;
+
+--2
+SELECT * FROM books
+ORDER BY price DESC;
+--3
+SELECT * FROM books
+JOIN authors ON books.author_id = authors.id
+ORDER BY authors.author_name ASC;
+--4
+SELECT * FROM books
+WHERE genre = 'Roman';
+
+--5
+SELECT * FROM books
+LIMIT 5;
+--6
+SELECT * FROM books
+FETCH FIRST 5 ROWS ONLY;
+--7
+SELECT * FROM books
+WHERE genre IN ('Roman', 'Siyosat', 'Falsafa');
+--8
+SELECT * FROM books
+WHERE price BETWEEN 15 AND 20;
+
+--9
+SELECT * FROM books
+WHERE book_name LIKE '%Hayot%';
+
+--10
+SELECT * FROM book_reviews
+WHERE review_text IS NULL;
+
+
+SELECT genre, COUNT(*) AS "Kitoblar soni"
+FROM books
+GROUP BY genre;
+
+
+
+-- ---------------------4 QOSHIMCHA
+SELECT books.book_name, authors.author_name
+FROM books
+JOIN authors ON books.author_id = authors.id;
+
+SELECT genre, COUNT(*) AS "Kitoblar soni"
+FROM books
+GROUP BY genre
+HAVING COUNT(*) > 3;
+
+SELECT 
+    books.book_name AS "Kitob nomi", 
+    authors.author_name AS "Muallif",
+    publishers.publisher_name AS "Nashriyot",
+    books.genre AS "Janr",
+    books.publish_date AS "Nashr sanasi",
+    books.price AS "Narx"
+FROM books
+JOIN authors ON books.author_id = authors.id
+JOIN publishers ON books.publisher_id = publishers.id;
+
